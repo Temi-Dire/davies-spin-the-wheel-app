@@ -40,11 +40,12 @@
 }
 
 body {
-    display: flex;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    align-items: center; */
     background-color: #333;
+    max-height: 100vh;
+    overflow: hidden;
 }
 
 .container {
