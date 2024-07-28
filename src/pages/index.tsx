@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import SEO from "@/components/SEO";
+import Modal from "@/components/Modal";
 
 const segments = ["100", "20", "5", "10", "1000", "0", "50", "1"];
 
@@ -8,11 +9,15 @@ export default function Home() {
     const wheelRef = useRef<HTMLDivElement>(null);
     const [spinning, setSpinning] = useState<boolean>(false);
 
+    const [spins, setSpins] = useState<number>(5);
+    const [open, setOpen] = useState<string | null>(null);
+
     const handleClick = () => {
         // Generate a random rotation angle between 0 and 3600 degrees
         const newRotation = rotateWheel + Math.ceil(Math.random() * 3600);
         setSpinning(true);
         setRotateWheel(newRotation);
+        setSpins((prev) => (prev > 0 ? prev - 1 : 0));
     };
 
     useEffect(() => {
@@ -30,6 +35,7 @@ export default function Home() {
                 const value = segments[segmentIndex];
                 setSpinning(false);
                 console.log(`The pointer lands on: ${value}`);
+                setOpen(value);
             }
         };
 
@@ -46,14 +52,12 @@ export default function Home() {
     }, [rotateWheel]);
 
     return (
-        <main className="h-screen">
+        <main className="">
             <SEO title="Home" />
-            <h1 className=" pt-6 text-center text-5xl font-bold text-white">DAVIES SPIN-THE-WHEEL APP</h1>
-            <div className="flex h-[90vh] w-full  items-center justify-center">
+            <h1 className=" pt-2 text-center text-5xl font-bold text-black">DAVIES SPIN-THE-WHEEL APP</h1>
+            <div className="flex h-[60vh] w-full  items-center justify-center ">
                 <div className="container">
-                    <button disabled={spinning} className={`spinBtn ${spinning && "cursor-not-allowed"}`} onClick={handleClick}>
-                        Spin
-                    </button>
+                    <div className={"spinBtn"}>{spins}</div>
                     <div ref={wheelRef} className="wheel" style={{ transform: `rotate(${rotateWheel}deg)` }}>
                         <div className="number number--one">
                             <span>100</span>
@@ -82,6 +86,16 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+            <div className="flex items-center justify-center text-2xl font-bold text-white">
+                {spins !== 0 ? (
+                    <button disabled={spinning} className={`rounded-md bg-black px-4 py-2 ${spinning && "cursor-not-allowed"}`} onClick={handleClick}>
+                        SPIN
+                    </button>
+                ) : (
+                    <p>You have no spins left</p>
+                )}
+            </div>
+            <Modal message={`You won a ${open}`} isOpen={open ? true : false} onClose={() => setOpen(null)} />
         </main>
     );
 }
