@@ -6,10 +6,12 @@ const segments = ["100", "20", "5", "10", "1000", "0", "50", "1"];
 export default function Home() {
     const [rotateWheel, setRotateWheel] = useState<number>(0);
     const wheelRef = useRef<HTMLDivElement>(null);
+    const [spinning, setSpinning] = useState<boolean>(false);
 
     const handleClick = () => {
         // Generate a random rotation angle between 0 and 3600 degrees
         const newRotation = rotateWheel + Math.ceil(Math.random() * 3600);
+        setSpinning(true);
         setRotateWheel(newRotation);
     };
 
@@ -26,6 +28,7 @@ export default function Home() {
 
                 // Log the value that the pointer lands on
                 const value = segments[segmentIndex];
+                setSpinning(false);
                 console.log(`The pointer lands on: ${value}`);
             }
         };
@@ -48,9 +51,9 @@ export default function Home() {
             <h1 className=" pt-6 text-center text-5xl font-bold text-white">DAVIES SPIN-THE-WHEEL APP</h1>
             <div className="flex h-[90vh] w-full  items-center justify-center">
                 <div className="container">
-                    <div className="spinBtn" onClick={handleClick}>
+                    <button disabled={spinning} className={`spinBtn ${spinning && "cursor-not-allowed"}`} onClick={handleClick}>
                         Spin
-                    </div>
+                    </button>
                     <div ref={wheelRef} className="wheel" style={{ transform: `rotate(${rotateWheel}deg)` }}>
                         <div className="number number--one">
                             <span>100</span>
