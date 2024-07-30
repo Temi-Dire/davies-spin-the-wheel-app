@@ -18,6 +18,18 @@ export default function Home() {
         setSpinning(true);
         setRotateWheel(newRotation);
         setSpins((prev) => (prev > 0 ? prev - 1 : 0));
+
+        const totalSegments = segments.length;
+        const rotationPerSegment = 360 / totalSegments;
+        const normalizedRotation = newRotation % 360; // Ensure angle is between 0 and 359 degrees
+
+        // Determine the segment index using a more accurate approach
+        // Use `Math.floor` to get the segment index directly
+        const segmentIndex = Math.floor((normalizedRotation + rotationPerSegment / 2) / rotationPerSegment) % totalSegments;
+
+        // Log the value that the pointer lands on
+        const value = segments[segmentIndex];
+        console.log(`The pointer lands on: ${value}`);
     };
 
     useEffect(() => {
