@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import SEO from "@/components/SEO";
 import Modal from "@/components/Modal";
+import { useRouter } from "next/router";
+import { useElements } from "@/hooks/useElements";
+import { API_URI } from "@/utilities/constants";
 
 const segments = ["100", "20", "5", "10", "1000", "0", "50", "1"];
 
@@ -9,8 +12,15 @@ export default function Home() {
     const wheelRef = useRef<HTMLDivElement>(null);
     const [spinning, setSpinning] = useState<boolean>(false);
 
+    const router = useRouter();
+
     const [spins, setSpins] = useState<number>(5);
     const [open, setOpen] = useState<string | null>(null);
+
+    const { query } = useRouter();
+    const { user_id } = query;
+
+    const { data } = useElements(user_id as string);
 
     const handleClick = () => {
         // Generate a random rotation angle between 0 and 3600 degrees
@@ -29,7 +39,8 @@ export default function Home() {
 
         // Log the value that the pointer lands on
         const value = segments[segmentIndex];
-        console.log(`The pointer lands on: ${value}`);
+        console.log(`The pointer lands on: ${value} ${JSON.stringify(router.query)}`);
+        console.log(data, process.env.NEXT_PUBLIC_BASE_URL)
     };
 
     useEffect(() => {
