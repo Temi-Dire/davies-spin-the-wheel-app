@@ -1,6 +1,5 @@
 import ApiClient from "@/services/api-client";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
 type ElementData = any;
 
@@ -10,7 +9,7 @@ export const useElements = (user_id: string) => {
 
     return useQuery({
         queryKey: [user_id],
-        queryFn: () => axios.get('/api/1289366093'),
+        queryFn: () => apiClient.get(),
         enabled: !!user_id,
     });
 };
