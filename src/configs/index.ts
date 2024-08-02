@@ -21,15 +21,6 @@ const GLOBAL_CONSTANTS = {
     // System Constants
     // ============================================================
     APP_NAME: "nextjs-boilertemplate",
-
-    // Sentry & Monitoring Configs
-    // ============================================================
-    SENTRY: {
-        RELEASE: APP_VERSION,
-        DSN: "", // TODO: Add Sentry DSN here
-        PROJECT: "", // TODO: Add Sentry Project here
-        ORGANISATION: "", // TODO: Add Sentry Organisation here
-    },
 };
 
 const CONFIG_BUILDER = {
