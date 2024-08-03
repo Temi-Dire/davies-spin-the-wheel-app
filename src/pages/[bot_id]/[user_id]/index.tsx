@@ -3,24 +3,28 @@ import SEO from "@/components/SEO";
 import Modal from "@/components/Modal";
 import { useRouter } from "next/router";
 import { useElements } from "@/hooks/useElements";
+type GiftData = {
+    value: string;
+    type: string;
+};
 
 
 export default function Home() {
     const [rotateWheel, setRotateWheel] = useState<number>(0);
     const wheelRef = useRef<HTMLDivElement>(null);
     const [spinning, setSpinning] = useState<boolean>(false);
-    
+
     const router = useRouter();
-    
+
     // const [spins, setSpins] = useState<number>(5);
-    const [open, setOpen] = useState<string | null | undefined | number>(null);
-    
+    const [open, setOpen] = useState<GiftData | null | undefined >(null);
+
     const { query } = useRouter();
-    const { user_id } = query;
-    
-    const { data } = useElements(user_id as string);
-    
-    const segments = data?.wheels.map((item) => item.value);
+    const { user_id, bot_id } = query;
+
+    var { data } = useElements(user_id as string, bot_id as string);
+
+    const segments = data?.wheels;
 
     const handleClick = () => {
         // Generate a random rotation angle between 0 and 3600 degrees
@@ -38,9 +42,10 @@ export default function Home() {
         const segmentIndex = rotationPerSegment && Math.floor((normalizedRotation + rotationPerSegment / 2) / rotationPerSegment) % totalSegments;
 
         // Log the value that the pointer lands on
-        const value = segments && segmentIndex && segments[segmentIndex];
-        console.log(`The pointer lands on: ${value} ${JSON.stringify(router.query)}`);
-        console.log(data, process.env.NEXT_PUBLIC_BASE_URL)
+        const s = segments && segmentIndex && segments[segmentIndex];
+        data.spins--;
+        // Send post request to /api/{bot_id}/{user_id}/spin
+        console.log(`The pointer lands on: ${s.value} ${s.type}`);
     };
 
     useEffect(() => {
@@ -57,7 +62,6 @@ export default function Home() {
                 // Log the value that the pointer lands on
                 const value = segments && segmentIndex && segments[segmentIndex];
                 setSpinning(false);
-                console.log(`The pointer lands on: ${value}`);
                 setOpen(value);
             }
         };
@@ -73,7 +77,26 @@ export default function Home() {
             }
         };
     }, [rotateWheel]);
+    useEffect(() => {
+        if (segments && wheelRef.current) {
+            const wheel = wheelRef.current;
+            const colors = [
+                '#d25353', 'purple', 'yellow', 'green', 'blue', 'orange', 'brown', 'wheat',
+                '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF', '#33FFF5', '#F5FF33',
+                '#FF8C00', '#8B0000', '#2E8B57', '#4682B4', '#DAA520', '#4B0082', '#FF4500'
+            ]
+            const segmentCount = segments.length;
 
+            segments.forEach((segment: GiftData, index: number) => {
+                const segmentDiv = document.createElement('div');
+                segmentDiv.className = `number`;
+                segmentDiv.style.background = colors[index % colors.length];
+                segmentDiv.style.transform = `rotate(${(360 / segmentCount) * index}deg)`;
+                segmentDiv.innerHTML = `<span>${segment.value}</span>`;
+                wheel.appendChild(segmentDiv);
+            });
+        }
+    }, [segments]);
     return (
         <main className="">
             <SEO title="Home" />
@@ -82,30 +105,6 @@ export default function Home() {
                 <div className="container">
                     <div className={"spinBtn"}>{data?.spins}</div>
                     <div ref={wheelRef} className="wheel" style={{ transform: `rotate(${rotateWheel}deg)` }}>
-                    <div className="number number--one">
-                            <span>{data?.wheels[0]?.value}</span>
-                        </div>
-                        <div className="number number--two">
-                            <span>{data?.wheels[1]?.value}</span>
-                        </div>
-                        <div className="number number--three">
-                            <span>{data?.wheels[2]?.value}</span>
-                        </div>
-                        <div className="number number--four">
-                            <span>{data?.wheels[3]?.value}</span>
-                        </div>
-                        <div className="number number--five">
-                            <span>{data?.wheels[4]?.value}</span>
-                        </div>
-                        <div className="number number--six">
-                            <span>{data?.wheels[5]?.value}</span>
-                        </div>
-                        <div className="number number--seven ">
-                            <span>{data?.wheels[6]?.value}</span>
-                        </div>
-                        <div className="number number--eight">
-                            <span>{data?.wheels[7]?.value}</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -114,12 +113,12 @@ export default function Home() {
                     <button disabled={spinning} className={`rounded-md bg-black px-4 py-2 ${spinning && "cursor-not-allowed"}`} onClick={handleClick}>
                         SPIN
                     </button>)}
-                    {/* <button onClick={() => console.log(data?.wheels.map((item) => item.value))}>click</button> */}
+                {/* <button onClick={() => console.log(data?.wheels.map((item) => item.value))}>click</button> */}
                 {/* ) : ( */}
-                    {/* <p>You have no spins left</p> */}
+                {/* <p>You have no spins left</p> */}
                 {/* )} */}
             </div>
-            <Modal message={`You won a ${open}`} isOpen={open ? true : false} onClose={() => setOpen(null)} />
+            <Modal message={`You won a ${open?.value}`} isOpen={open ? true : false} onClose={() => setOpen(null)} />
         </main>
     );
 }

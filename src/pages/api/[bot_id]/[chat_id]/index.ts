@@ -7,12 +7,10 @@ import connectMongoDB from "@/models/mongo";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "GET") {
         await connectMongoDB();
-        const { chat_id } = req.query;
-        let user = await User.findOne({ _id: chat_id });
-
-        if (!user) {
-            return res.status(200).json({ _id: chat_id, spins: 0, wheels: await Wheel.find() });
-        }
-        return res.status(200).json({ _id: chat_id, spins: user.spins, wheels: await Wheel.find() });
+        const { chat_id, bot_id } = req.query;
+        let user = await User.findOne({ chat_id, bot_id });
+        const wheels = await Wheel.find();
+        const spins = user?.spins || 0;
+        return res.status(200).json({ chat_id, spins: spins, wheels });
     }
 }
