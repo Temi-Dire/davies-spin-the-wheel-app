@@ -3,11 +3,11 @@ import SEO from "@/components/SEO";
 import Modal from "@/components/Modal";
 import { useRouter } from "next/router";
 import { useElements } from "@/hooks/useElements";
+import { useSendData } from "@/hooks/useSendData";
 type GiftData = {
     value: string;
     type: string;
 };
-
 
 export default function Home() {
     const [rotateWheel, setRotateWheel] = useState<number>(0);
@@ -17,12 +17,13 @@ export default function Home() {
     const router = useRouter();
 
     // const [spins, setSpins] = useState<number>(5);
-    const [open, setOpen] = useState<GiftData | null | undefined >(null);
+    const [open, setOpen] = useState<GiftData | null | undefined>(null);
 
     const { query } = useRouter();
     const { user_id, bot_id } = query;
 
-    var { data } = useElements(user_id as string, bot_id as string);
+    let { data } = useElements(user_id as string, bot_id as string);
+    const { mutate } = useSendData(user_id as string, bot_id as string);
 
     const segments = data?.wheels;
 
@@ -45,6 +46,7 @@ export default function Home() {
         const s = segments && segmentIndex && segments[segmentIndex];
         data.spins--;
         // Send post request to /api/{bot_id}/{user_id}/spin
+        mutate(s);
         console.log(`The pointer lands on: ${s.value} ${s.type}`);
     };
 
@@ -80,15 +82,11 @@ export default function Home() {
     useEffect(() => {
         if (segments && wheelRef.current) {
             const wheel = wheelRef.current;
-            const colors = [
-                '#d25353', 'purple', 'yellow', 'green', 'blue', 'orange', 'brown', 'wheat',
-                '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF', '#33FFF5', '#F5FF33',
-                '#FF8C00', '#8B0000', '#2E8B57', '#4682B4', '#DAA520', '#4B0082', '#FF4500'
-            ]
+            const colors = ["#d25353", "purple", "yellow", "green", "blue", "orange", "brown", "wheat", "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#A133FF", "#33FFF5", "#F5FF33", "#FF8C00", "#8B0000", "#2E8B57", "#4682B4", "#DAA520", "#4B0082", "#FF4500"];
             const segmentCount = segments.length;
 
             segments.forEach((segment: GiftData, index: number) => {
-                const segmentDiv = document.createElement('div');
+                const segmentDiv = document.createElement("div");
                 segmentDiv.className = `number`;
                 segmentDiv.style.background = colors[index % colors.length];
                 segmentDiv.style.transform = `rotate(${(360 / segmentCount) * index}deg)`;
@@ -104,15 +102,15 @@ export default function Home() {
             <div className="flex h-[60vh] w-full  items-center justify-center ">
                 <div className="container">
                     <div className={"spinBtn"}>{data?.spins}</div>
-                    <div ref={wheelRef} className="wheel" style={{ transform: `rotate(${rotateWheel}deg)` }}>
-                    </div>
+                    <div ref={wheelRef} className="wheel" style={{ transform: `rotate(${rotateWheel}deg)` }}></div>
                 </div>
             </div>
             <div className="flex items-center justify-center text-2xl font-bold text-white">
                 {data?.spins !== 0 && (
                     <button disabled={spinning} className={`rounded-md bg-black px-4 py-2 ${spinning && "cursor-not-allowed"}`} onClick={handleClick}>
                         SPIN
-                    </button>)}
+                    </button>
+                )}
                 {/* <button onClick={() => console.log(data?.wheels.map((item) => item.value))}>click</button> */}
                 {/* ) : ( */}
                 {/* <p>You have no spins left</p> */}
