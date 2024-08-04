@@ -90,7 +90,7 @@ export default function Home() {
                 segmentDiv.className = `number`;
                 segmentDiv.style.background = colors[index % colors.length];
                 segmentDiv.style.transform = `rotate(${(360 / segmentCount) * index}deg)`;
-                segmentDiv.innerHTML = `<span>${segment.value}</span>`;
+                segmentDiv.innerHTML = `<span style="transform: rotate(-50deg);">${segment.value + "1"}</span>`;
                 wheel.appendChild(segmentDiv);
             });
         }
