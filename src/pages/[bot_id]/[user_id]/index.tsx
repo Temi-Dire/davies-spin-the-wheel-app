@@ -98,7 +98,7 @@ export default function Home() {
     return (
         <main className="">
             <SEO title="Home" />
-            <h1 className=" pt-2 text-center text-5xl font-bold text-black">SPIN-THE-WHEEL</h1>
+            <h1 className=" pt-2 text-center text-5xl font-bold text-black">סובב את הגלגל</h1>
             <div className="flex h-[60vh] w-full  items-center justify-center ">
                 <div className="container">
                     <div className={"spinBtn"}>{data?.spins}</div>
