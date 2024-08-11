@@ -1,4 +1,5 @@
 import { Html, Head, Main, NextScript } from "next/document";
+import Script from "next/script";
 
 export default function Document() {
     return (
@@ -9,6 +10,7 @@ export default function Document() {
 
                 {/* Get default font file from https://fonts.google.com  */}
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap" />
+                <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
             </Head>
             <body>
                 <Main />

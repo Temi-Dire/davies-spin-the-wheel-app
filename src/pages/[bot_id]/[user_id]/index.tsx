@@ -7,6 +7,7 @@ import { useSendData } from "@/hooks/useSendData";
 type GiftData = {
     value: string;
     type: string;
+    text?: string;
 };
 
 export default function Home() {
@@ -90,7 +91,7 @@ export default function Home() {
                 segmentDiv.className = `number`;
                 segmentDiv.style.background = colors[index % colors.length];
                 segmentDiv.style.transform = `rotate(${(360 / segmentCount) * index}deg)`;
-                segmentDiv.innerHTML = `<span style="transform: rotate(-139deg);">${segment.value + "1"}</span>`;
+                segmentDiv.innerHTML = `<span style="transform: rotate(-139deg);">${segment.text || segment.value}</span>`;
                 wheel.appendChild(segmentDiv);
             });
         }
@@ -99,7 +100,7 @@ export default function Home() {
         <main className="">
             <SEO title="Home" />
             <h1 className=" pt-2 text-center text-5xl font-bold text-black">סובב את הגלגל</h1>
-            <div className="flex h-[60vh] w-full  items-center justify-center ">
+            <div className="flex h-[50vh] w-full  items-center justify-center ">
                 <div className="container">
                     <div className={"spinBtn"}>{data?.spins}</div>
                     <div ref={wheelRef} className="wheel" style={{ transform: `rotate(${rotateWheel}deg)` }}></div>
@@ -116,7 +117,8 @@ export default function Home() {
                 {/* <p>You have no spins left</p> */}
                 {/* )} */}
             </div>
-            <Modal message={`You won a ${open?.value}`} isOpen={open ? true : false} onClose={() => setOpen(null)} />
+            <Modal message={`זכית ב ${open?.value}` + (open?.type == "product" ? `\nלאחר אישור המוצרים דרך כפתור ׳איסוף זכיות׳ בבוט הראשי 
+המוצרים יתווספו באופן אוטומטי להזמנה הקרובה שלך`: "")} isOpen={open ? true : false} onClose={() => { setOpen(null); window?.Telegram?.WebApp?.close() }} />
         </main>
     );
 }
