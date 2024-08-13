@@ -10,6 +10,7 @@
     /* Specify default font below */
     html {
         font-family: "DM Sans", sans-serif;
+        font-size: calc(100vw / 725 * 14);
     }
 
     /* Daisy UI Resets */
@@ -50,8 +51,8 @@ body {
 
 .container {
     position: relative;
-    width: 300px;
-    height: 300px;
+    width: 33rem;
+    height: 33rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -59,8 +60,8 @@ body {
 
 .container .spinBtn {
     position: absolute;
-    width: 60px;
-    height: 60px;
+    width: 3rem;
+    height: 3rem;
     background: #fff;
     border-radius: 50%;
     z-index: 10;
@@ -78,9 +79,9 @@ body {
 .spinBtn::before {
     content: "";
     position: absolute;
-    top: -20px;
-    width: 20px;
-    height: 30px;
+    top: -1rem;
+    width: 1rem;
+    height: 1.5rem;
     background: #fff;
     clip-path: polygon(50% 0%, 15% 100%, 85% 100%);
 }
@@ -109,38 +110,5 @@ body {
     width: 50%;
     height: 50%;
     transform-origin: bottom right;
-    clip-path: polygon(0 0, 59% 0, 100% 100%, 0 59%);
-}
-
-.number--one {
-    background: #d25353;
-    transform: rotate(calc(45deg * 1));
-}
-.number--two {
-    background: purple;
-    transform: rotate(calc(45deg * 2));
-}
-.number--three {
-    background: yellow;
-    transform: rotate(calc(45deg * 3));
-}
-.number--four {
-    background: green;
-    transform: rotate(calc(45deg * 4));
-}
-.number--five {
-    background: blue;
-    transform: rotate(calc(45deg * 5));
-}
-.number--six {
-    background: orange;
-    transform: rotate(calc(45deg * 6));
-}
-.number--seven {
-    background: brown;
-    transform: rotate(calc(45deg * 7));
-}
-.number--eight {
-    background: wheat;
-    transform: rotate(calc(45deg * 8));
+    clip-path: polygon(0 0, 23% 0, 100% 100%, 0 59%);
 }

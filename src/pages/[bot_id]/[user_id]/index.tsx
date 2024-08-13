@@ -91,8 +91,10 @@ export default function Home() {
                 segmentDiv.className = `number`;
                 segmentDiv.style.background = colors[index % colors.length];
                 segmentDiv.style.transform = `rotate(${(360 / segmentCount) * index}deg)`;
-                segmentDiv.innerHTML = `<span style="transform: rotate(-139deg);">${segment.text || segment.value}</span>`;
+                // segmentDiv.style.transform = `rotate(${(360 / 12) * 18}deg)`;
+                segmentDiv.innerHTML = `<span style="transform: rotate(-143deg); margin-top: 6rem; margin-left: 2.5rem">${segment.text || segment.value}</span>`;
                 wheel.appendChild(segmentDiv);
+                console.log(index);
             });
         }
     }, [segments]);
@@ -117,8 +119,20 @@ export default function Home() {
                 {/* <p>You have no spins left</p> */}
                 {/* )} */}
             </div>
-            <Modal message={`זכית ב ${open?.value}` + (open?.type == "product" ? `\nלאחר אישור המוצרים דרך כפתור ׳איסוף זכיות׳ בבוט הראשי 
-המוצרים יתווספו באופן אוטומטי להזמנה הקרובה שלך`: "")} isOpen={open ? true : false} onClose={() => { setOpen(null); window?.Telegram?.WebApp?.close() }} />
+            <Modal
+                message={
+                    `זכית ב ${open?.value}` +
+                    (open?.type == "product"
+                        ? `\nלאחר אישור המוצרים דרך כפתור ׳איסוף זכיות׳ בבוט הראשי 
+המוצרים יתווספו באופן אוטומטי להזמנה הקרובה שלך`
+                        : "")
+                }
+                isOpen={open ? true : false}
+                onClose={() => {
+                    setOpen(null);
+                    window?.Telegram?.WebApp?.close();
+                }}
+            />
         </main>
     );
 }
