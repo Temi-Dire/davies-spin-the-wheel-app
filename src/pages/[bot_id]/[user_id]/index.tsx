@@ -130,7 +130,7 @@ export default function Home() {
                 isOpen={open ? true : false}
                 onClose={() => {
                     setOpen(null);
-                    window?.Telegram?.WebApp?.close();
+                    if (data?.spins === 0) window?.Telegram?.WebApp?.close();
                 }}
             />
         </main>
