@@ -4,6 +4,7 @@ import Modal from "@/components/Modal";
 import { useRouter } from "next/router";
 import { useElements } from "@/hooks/useElements";
 import { useSendData } from "@/hooks/useSendData";
+
 type GiftData = {
     value: string;
     type: string;
@@ -14,58 +15,57 @@ export default function Home() {
     const [rotateWheel, setRotateWheel] = useState<number>(0);
     const wheelRef = useRef<HTMLDivElement>(null);
     const [spinning, setSpinning] = useState<boolean>(false);
-
-    const router = useRouter();
-
-    // const [spins, setSpins] = useState<number>(5);
     const [open, setOpen] = useState<GiftData | null | undefined>(null);
 
     const { query } = useRouter();
     const { user_id, bot_id } = query;
 
-    let { data } = useElements(user_id as string, bot_id as string);
+    const { data } = useElements(user_id as string, bot_id as string);
     const { mutate } = useSendData(user_id as string, bot_id as string);
 
     const segments = data?.wheels;
 
+    const getSegmentIndex = (rotation: number, totalSegments: number) => {
+        const rotationPerSegment = 360 / totalSegments;
+        const normalizedRotation = rotation % 360;
+        const segmentIndex = Math.floor(normalizedRotation / rotationPerSegment);
+        return segmentIndex;
+    };
+
     const handleClick = () => {
-        // Generate a random rotation angle between 0 and 3600 degrees
         const newRotation = rotateWheel + Math.ceil(Math.random() * 3600);
         setSpinning(true);
         setRotateWheel(newRotation);
-        // setSpins((prev) => (prev > 0 ? prev - 1 : 0));
 
-        const totalSegments = segments?.length;
-        const rotationPerSegment = totalSegments && 360 / totalSegments;
-        const normalizedRotation = newRotation % 360; // Ensure angle is between 0 and 359 degrees
+        const totalSegments = segments?.length ?? 12; // Default to 12 segments if not defined
+        const segmentIndex = getSegmentIndex(newRotation, totalSegments);
+        const s = segments ? segments[segmentIndex] : null;
 
-        // Determine the segment index using a more accurate approach
-        // Use `Math.floor` to get the segment index directly
-        const segmentIndex = rotationPerSegment && Math.floor((normalizedRotation + rotationPerSegment / 2) / rotationPerSegment) % totalSegments;
+        if (data) {
+            data.spins--;
+        }
 
-        // Log the value that the pointer lands on
-        const s = segments && segmentIndex && segments[segmentIndex];
-        data.spins--;
-        // Send post request to /api/{bot_id}/{user_id}/spin
         mutate(s);
-        console.log(`The pointer lands on: ${s.value} ${s.type}`);
+        console.log(`New rotation: ${newRotation}`);
+        console.log(`Normalized rotation: ${newRotation % 360}`);
+        console.log(`Segment index: ${segmentIndex}`);
+        console.log(`The pointer lands on: ${s?.value} ${s?.type}`);
     };
 
     useEffect(() => {
         const handleTransitionEnd = () => {
             if (wheelRef.current) {
-                // Calculate the index of the segment the pointer lands on
-                const totalSegments = segments?.length;
-                const rotationPerSegment = totalSegments && 360 / totalSegments;
-                const normalizedRotation = (rotateWheel ?? 0) % 360; // Ensure angle is between 0 and 359 degrees
+                const totalSegments = segments?.length ?? 12;
+                const segmentIndex = getSegmentIndex(rotateWheel, totalSegments);
+                const value = segments ? segments[segmentIndex] : null;
 
-                // Determine the segment index using a more accurate approach
-                const segmentIndex = rotationPerSegment && Math.floor((normalizedRotation + rotationPerSegment / 2) / rotationPerSegment) % totalSegments;
-
-                // Log the value that the pointer lands on
-                const value = segments && segmentIndex && segments[segmentIndex];
                 setSpinning(false);
                 setOpen(value);
+
+                console.log(`Transition end - Total segments: ${totalSegments}`);
+                console.log(`Transition end - Normalized rotation: ${rotateWheel % 360}`);
+                console.log(`Transition end - Segment index: ${segmentIndex}`);
+                console.log(`Transition end - The pointer lands on: ${value?.value} ${value?.type}`);
             }
         };
 
@@ -73,13 +73,13 @@ export default function Home() {
             wheelRef.current.addEventListener("transitionend", handleTransitionEnd);
         }
 
-        // Cleanup event listener on component unmount
         return () => {
             if (wheelRef.current) {
                 wheelRef.current.removeEventListener("transitionend", handleTransitionEnd);
             }
         };
-    }, [rotateWheel]);
+    }, [rotateWheel, segments]);
+
     useEffect(() => {
         if (segments && wheelRef.current) {
             const wheel = wheelRef.current;
@@ -91,18 +91,17 @@ export default function Home() {
                 segmentDiv.className = `number`;
                 segmentDiv.style.background = colors[index % colors.length];
                 segmentDiv.style.transform = `rotate(${(360 / segmentCount) * index}deg)`;
-                // segmentDiv.style.transform = `rotate(${(360 / 12) * 18}deg)`;
                 segmentDiv.innerHTML = `<span style="transform: rotate(-143deg); margin-top: 6rem; margin-left: 2.5rem">${segment.text || segment.value}</span>`;
                 wheel.appendChild(segmentDiv);
-                console.log(index);
             });
         }
     }, [segments]);
+
     return (
         <main className="">
             <SEO title="Home" />
-            <h1 className=" pt-2 text-center text-5xl font-bold text-black">סובב את הגלגל</h1>
-            <div className="flex h-[50vh] w-full  items-center justify-center ">
+            <h1 className="pt-2 text-center text-5xl font-bold text-black">סובב את הגלגל</h1>
+            <div className="flex h-[50vh] w-full items-center justify-center ">
                 <div className="container">
                     <div className={"spinBtn"}>{data?.spins}</div>
                     <div ref={wheelRef} className="wheel" style={{ transform: `rotate(${rotateWheel}deg)` }}></div>
@@ -114,18 +113,9 @@ export default function Home() {
                         SPIN
                     </button>
                 )}
-                {/* <button onClick={() => console.log(data?.wheels.map((item) => item.value))}>click</button> */}
-                {/* ) : ( */}
-                {/* <p>You have no spins left</p> */}
-                {/* )} */}
             </div>
             <Modal
-                message={
-                    `זכית ב ${open?.value}` +
-                    (open?.type == "product"
-                        ? `\nהמוצר יצורף באופן אוטומטי להזמנה הקרובה שלך ☑️`
-                        : "")
-                }
+                message={`זכית ב ${open?.value}` + (open?.type === "product" ? `\nהמוצר יצורף באופן אוטומטי להזמנה הקרובה שלך ☑️` : "")}
                 isOpen={open ? true : false}
                 onClose={() => {
                     setOpen(null);
