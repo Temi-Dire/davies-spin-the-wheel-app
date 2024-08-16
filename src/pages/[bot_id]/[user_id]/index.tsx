@@ -12,7 +12,7 @@ type GiftData = {
 };
 
 export default function Home() {
-    const [rotateWheel, setRotateWheel] = useState<number>(0);
+    const [rotateWheel, setRotateWheel] = useState<number>(52);
     const wheelRef = useRef<HTMLDivElement>(null);
     const [spinning, setSpinning] = useState<boolean>(false);
     const [open, setOpen] = useState<GiftData | null | undefined>(null);
@@ -33,42 +33,36 @@ export default function Home() {
     };
 
     const handleClick = () => {
-        const newRotation = rotateWheel + Math.ceil(Math.random() * 3600);
+        const newRotation = rotateWheel + Math.floor(Math.random() * 360) + 3600;
         setSpinning(true);
         setRotateWheel(newRotation);
+    };
 
-        const totalSegments = segments?.length ?? 12; // Default to 12 segments if not defined
-        const segmentIndex = getSegmentIndex(newRotation, totalSegments);
-        const s = segments ? segments[segmentIndex] : null;
+    const handleTransitionEnd = () => {
+        if (wheelRef.current) {
+            const totalSegments = segments?.length ?? 12;
+            const rotationPerSegment = 360 / totalSegments;
+            const normalizedRotation = (rotateWheel % 360) - 2 * rotationPerSegment;
+            const segmentIndex = Math.floor(((360 - normalizedRotation + rotationPerSegment / 2) % 360) / rotationPerSegment);
+            const value = segments ? segments[segmentIndex] : null;
 
-        if (data) {
-            data.spins--;
+            setSpinning(false);
+            setOpen(value);
+
+            if (data) {
+                data.spins--;
+            }
+    
+            mutate(segments[segmentIndex]);
+
+            console.log(`Transition end - Total segments: ${totalSegments}`);
+            console.log(`Transition end - Normalized rotation: ${normalizedRotation}`);
+            console.log(`Transition end - Segment index: ${segmentIndex}`);
+            console.log(`Transition end - The pointer lands on: ${value?.value} ${value?.type}`);
         }
-
-        mutate(s);
-        console.log(`New rotation: ${newRotation}`);
-        console.log(`Normalized rotation: ${newRotation % 360}`);
-        console.log(`Segment index: ${segmentIndex}`);
-        console.log(`The pointer lands on: ${s?.value} ${s?.type}`);
     };
 
     useEffect(() => {
-        const handleTransitionEnd = () => {
-            if (wheelRef.current) {
-                const totalSegments = segments?.length ?? 12;
-                const segmentIndex = getSegmentIndex(rotateWheel, totalSegments);
-                const value = segments ? segments[segmentIndex] : null;
-
-                setSpinning(false);
-                setOpen(value);
-
-                console.log(`Transition end - Total segments: ${totalSegments}`);
-                console.log(`Transition end - Normalized rotation: ${rotateWheel % 360}`);
-                console.log(`Transition end - Segment index: ${segmentIndex}`);
-                console.log(`Transition end - The pointer lands on: ${value?.value} ${value?.type}`);
-            }
-        };
-
         if (wheelRef.current) {
             wheelRef.current.addEventListener("transitionend", handleTransitionEnd);
         }
